@@ -1,11 +1,5 @@
-#include<assert.h>
-#include<stdio.h>
-#include<stdlib.h>
+#define HM_IMPLEMENTATION
 #include "hm.h"
-#include<stdint.h>
-#include<string.h>
-
-//I was just playing around here in the main.c file. It's not part of the lib.
 
 int main() {
     char keys[10] = "abcdefghij";
@@ -22,7 +16,22 @@ int main() {
         printf("key: %s, value: %c\n", iter.key, *(int*)iter.value);
     }
 
+    int value1 = *(int*)hm_get(hashmap, "key_e");
+    int result = 'e';
+    assert((char)value1 == (char)result);
     hm_destroy(hashmap);
+
+    char* key = "username";
+    double value = 12.90988;
+    hm* hashm = hm_new();
+    hm_set(hashm, key, &value);
+
+    double* retrieved = (double*)hm_get(hashm, key);
+    assert(*retrieved == value);
+
+
+    printf("ok\n");
+
 
     return 0;
 }
