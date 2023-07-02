@@ -61,6 +61,12 @@ extern hmi hm_iterator(hm* map);
 //hm can't be updated while iterating
 extern int hm_iter_next(hmi* iter); 
 
+//prints to whole hashmap to the screen
+extern void hm_dump(hm* map, int idx);
+
+//serializes the map if value is char*, and returns the buffer length
+extern int hm_serialize_cstr(hm* map, uint8_t* buffer, int buffer_len, uint8_t kv_delim, uint8_t entry_delim);
+
 #endif //_HM_H
 
 #ifdef HM_IMPLEMENTATION
@@ -232,10 +238,36 @@ int hm_iter_next(hmi* iter) {
 }
 
 
+void hm_dump(hm* map, int idx) {
+    hmi iter = hm_iterator(map);
+    int i = 0;
+    while (hm_iter_next(&iter)) {
+        if (idx) {
+            printf("%d ", i);
+        }
+        printf("%s: %s\n", iter.key, iter.value);
+        i++;
+    }
+}
 
 
-
-
+int hm_serialize_cstr(hm* map, uint8_t* buffer, int buffer_len, uint8_t kv_delim, uint8_t entry_delim) {
+    int offset = 0;
+    hmi iter = hm_iterator(map);
+    while (hm_iter_next(&iter)) {
+        size_t k_len = strlen(iter.key);
+        size_t v_len = strlen(iter.value);
+        memcpy(buffer+offset, iter.key, k_len);
+        offset += k_len;
+        buffer[offset] = kv_delim;
+        offset += 1;
+        memcpy(buffer+offset, (uint8_t*)iter.value, v_len);
+        offset += v_len;
+        buffer[offset] = entry_delim;
+        offset++;
+    }
+    return offset;
+}
 
 
 

@@ -28,7 +28,24 @@ int main() {
 
     double* retrieved = (double*)hm_get(hashm, key);
     assert(*retrieved == value);
+    hm_destroy(hashm);
 
+    hm* ht = hm_new();
+    char* k1 = "key1";
+    char* v1 = "first_value";
+    char* k2 = "key2";
+    char* v2 = "second_value";
+    
+    hm_set(ht, k1, v1);
+    hm_set(ht, k2, v2);
+    
+    char expect[] = "key1 first_value\nkey2 second_value\n";
+    uint8_t buffer[1024];
+    int len = hm_serialize_cstr(ht, buffer, 1024, 32, 10);
+    for (int i =0; i < strlen(expect); ++i) {
+        assert(expect[i] == (char)buffer[i]);
+    }
+    assert(strlen(expect) == len);
 
     printf("ok\n");
 
