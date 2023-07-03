@@ -41,6 +41,10 @@ extern void* hm_get(hm* map, const char* key);
 //returns address of newly created key
 extern const char* hm_set(hm* map, const char* key, void* value);
 
+//removes entry by key return 1 if deletion success and 0 if not item not found
+extern int hm_remove(hm* map, char* key);
+
+
 // get length of table
 extern size_t hm_len(hm* map);
 
@@ -125,12 +129,18 @@ void* hm_get(hm* map, const char* key)
 {
     uint64_t hash = hasher(key);
     size_t index = (size_t) (hash & (uint64_t)(map->capacity - 1));
+    size_t index_cpy = index;
+    int is_round = 0;
     while (map->entries[index].key != NULL) {
+        if (is_round && index == index_cpy) {
+            return NULL;
+        }
         if (strcmp(key, map->entries[index].key) == 0) {
             return map->entries[index].value;
         } else {
             index++;
             if (index >= map->capacity) {
+                is_round = 0;
                 index=0;
             }
         }
@@ -209,6 +219,31 @@ const char* hm_set(hm* map, const char* key, void* value)
     }
 
     return hm_set_entry(map->entries, map->capacity, key, value, &map->length); 
+}
+
+extern int hm_remove(hm* map, char* key) {
+    uint64_t hash = hasher(key);
+    size_t index = (size_t) (hash & (uint64_t)(map->capacity - 1));
+    size_t index_cpy = index;
+    int is_round = 0;
+    while (map->entries[index].key != NULL) {
+        if (is_round && index == index_cpy) {
+            return 0;
+        }
+        if (strcmp(key, map->entries[index].key) == 0) {
+            map->length -= 1;
+            map->entries[index].key = NULL;
+            return 1;
+        } else {
+            index++;
+            if (index >= map->capacity) {
+                is_round = 1;
+                index=0;
+            }
+
+        }
+    }
+    return 0;
 }
 
 size_t hm_len(hm* map) {

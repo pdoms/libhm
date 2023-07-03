@@ -4,6 +4,9 @@
 int main() {
     char keys[10] = "abcdefghij";
     hm* hashmap = hm_new();
+    assert(hm_get(hashmap, "key") == NULL);
+
+
     for (int i =0; i < 10; ++i) {
         char* c = keys + i;
         char s[6] = "key_";
@@ -19,7 +22,18 @@ int main() {
     int value1 = *(int*)hm_get(hashmap, "key_e");
     int result = 'e';
     assert((char)value1 == (char)result);
+    printf("get ok\n");
+    int removed = hm_remove(hashmap, "key_c");
+    assert(removed == 1);
+    assert(hm_get(hashmap, "key_c") == NULL);
+    assert(hm_len(hashmap) == 9);
+    printf("remove ok\n");
     hm_destroy(hashmap);
+
+
+
+
+
 
     char* key = "username";
     double value = 12.90988;
@@ -29,7 +43,7 @@ int main() {
     double* retrieved = (double*)hm_get(hashm, key);
     assert(*retrieved == value);
     hm_destroy(hashm);
-
+    printf("numeric ok\n");
     hm* ht = hm_new();
     char* k1 = "key1";
     char* v1 = "first_value";
@@ -47,7 +61,7 @@ int main() {
     }
     assert(strlen(expect) == len);
 
-    printf("ok\n");
+    printf("serialize ok\n");
 
 
     return 0;
